@@ -31,7 +31,7 @@ def main():
                         nargs=1,
                         type=Path,
                         default=None,
-                        help='Installation directory for Describe',)
+                        help='Installation directory for Describe', )
 
     parser.add_argument("--stl", "-s",
                         nargs="*",
@@ -93,14 +93,15 @@ def main():
     # Initialise gds handler
     gdsman = NanoscribeGdsHandler(library=args.gds[0], out_dir=args.out_dir[0])
 
-    #Update the path to describe.exe if needed
+    # Update the path to describe.exe if needed
     if args.describe_dir is not None:
         gdsman.describepath = args.describe_dir
 
     logger.debug(f"Describe executable directory: {gdsman.describepath.resolve()}")
 
-    #Update the slicing recipe if needed
-    if args.
+    # Update the slicing recipe if needed
+    if args.recipe is not None:
+        gdsman.describerecipe = args.recipe
 
     # get the top cell and assign responsibility
     if args.topcell is None:
@@ -166,6 +167,7 @@ def main():
     logger.info(f"Origin of print: {gdsman.print_origin}")
     gdsman.create_print_job()
     gdsman.export_print_job()
+
 
 if __name__ == "__main__":
     main()

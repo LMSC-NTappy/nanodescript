@@ -12,6 +12,7 @@ OUTDIR = r"Y:\Nicolas\Software\descript-python\tests\test_pattern"
 
 heredir = Path(__file__).parent
 
+
 class TestNanoscribeGdsHandler:
     def setup_class(self):
         self.t_h = NanoscribeGdsHandler(library=Path(TESTLIB), out_dir=Path(OUTDIR))
@@ -67,6 +68,5 @@ class TestNanoscribeGdsHandler:
 
         assert self.t_h.nanoscribe_cells_associations
 
-    def test_output_directory(self,tmp_path):
-
+    def test_output_directory(self, tmp_path):
         self.t_h.output_directory = tmp_path

@@ -5,6 +5,7 @@ import warnings
 
 from nanodescript.constants import COMMENT_CHAR
 
+
 # Abstract Base Class for Nanoscribe commands
 class DescribeCommand(ABC):
     """Factory that initializes the correct Describe Command from a string. The factory doesn't maintain any of the
@@ -603,6 +604,7 @@ class Describe_repeat(DescribeCommand):
     def __init__(self, value: int = 1):
         self.value = value
 
+
 # Helper functions to ensure that var, local and set treat variable names similarily
 def _check_var_name(varstring: str) -> None:
     """ raise an error if the variable name does not comply with describe rules."""
@@ -709,11 +711,13 @@ class Describe_set(DescribeCommand):
 
 class Describe_empty(DescribeCommand):
     """Adds an empty line to the recipe"""
+
     def __init__(self) -> None:
         pass
 
     def __str__(self) -> str:
         return ""
+
 
 # if elif end statement will be basically treated as strings for the moment
 class Describe_if(DescribeCommand):

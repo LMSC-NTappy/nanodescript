@@ -13,8 +13,4 @@ class CellAssociation:
     transformation: CellTransformation = None
     stl_file: Path = None
     recipe: DescribeRecipe = None
-    out_datgwl: Path = None
-    out_jobgwl: Path = None
-    out_recipe: Path = None
-    out_files: Path = None
     include_file: Path = None

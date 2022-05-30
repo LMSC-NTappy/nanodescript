@@ -1,8 +1,9 @@
-#This file is mostly copied  from the nanoscribe guide "Nanoguide". Downloaded from
-#https://support.nanoscribe.com/hc/en-gb/articles/360003617073-ServerMode-and-CommandLineSlicer
-#Page consulted on 08th of november 2021"
+# This file is mostly copied  from the nanoscribe guide "Nanoguide". Downloaded from
+# https://support.nanoscribe.com/hc/en-gb/articles/360003617073-ServerMode-and-CommandLineSlicer
+# Page consulted on 08th of november 2021"
 from pathlib import Path
 from stl import mesh
+
 
 class StlFile(mesh.Mesh):
     def __init__(self, filename):

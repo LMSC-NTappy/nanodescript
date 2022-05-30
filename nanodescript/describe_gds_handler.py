@@ -19,6 +19,7 @@ from nanodescript.utils import find_stl_files
 
 logger = logging.getLogger(__name__)
 
+
 class NanoscribeGdsHandler:
     """Class to handle gds files using Nanoscribe."""
 
@@ -64,7 +65,7 @@ class NanoscribeGdsHandler:
         self.topcell = None
         self.print_origin = None
 
-        #Describe.exe file for subprocess slicing
+        # Describe.exe file for subprocess slicing
         self.describepath = describepath
 
     def set_matcher(self, matcher: NanoscribeMatcher) -> None:
@@ -209,7 +210,7 @@ class NanoscribeGdsHandler:
             if stl not in ['STL_NOT_FOUND', 'NOT_NANOSCRIBE']:
                 asso.stl_file = Path(stl)
 
-    def process_all_cells(self,) -> None:
+    def process_all_cells(self, ) -> None:
         """Process nanoscribe cells with a recipe"""
 
         for asso in tqdm(self.nanoscribe_cells_associations):
@@ -223,18 +224,19 @@ class NanoscribeGdsHandler:
         if self.describerecipe not in self.recipes:
             self.recipes.append(deepcopy(self.describerecipe))
             cell_recipe = self.recipes[-1]
-            iter = len(self.recipes)
+            iterator = len(self.recipes)
             # A directory is generated for the recipe. A bit useless to generate so many of them
             # But that's the only way I have found...
-            recipe_dir = self.out_dir.joinpath(f"{iter}_{cell_association.stl_file.stem}\\")
+            recipe_dir = self.out_dir.joinpath(f"{iterator}_{cell_association.stl_file.stem}\\")
             recipe_dir.mkdir(exist_ok=True)
-            recipe_file = recipe_dir.joinpath(f"{iter}_{cell_association.stl_file.stem}")
+            recipe_file = recipe_dir.joinpath(f"{iterator}_{cell_association.stl_file.stem}")
             cell_recipe.generate_gwl_code(tmp_recipe=recipe_file, describepath=self.describepath)
         else:
             idx = self.recipes.index(self.describerecipe)
             cell_recipe = self.recipes[idx]
 
         cell_association.recipe = cell_recipe
+        cell_association.include_file = cell_recipe.out_datgwl
 
     def get_bounding_box(self) -> (float, float, float, float):
         """Get the gds bounding box of the library and transformations"""
@@ -284,12 +286,12 @@ class NanoscribeGdsHandler:
             self.gwlhandler.add_command(cmds.Comment(f'Nanoscribe Zone {k}: {asso.cell.name}'))
             self.gwlhandler.add_command(cmds.MoveStageX(val=move[0]))
             self.gwlhandler.add_command(cmds.MoveStageY(val=move[1]))
-            #Include the output relative to the output directory
-            if asso.recipe.out_datgwl.is_relative_to(self.out_dir):
-                include_file = asso.recipe.out_datgwl.relative_to(self.out_dir)
+            # Include the output relative to the output directory
+            if asso.include_file.is_relative_to(self.out_dir):
+                include_file = asso.include_file.relative_to(self.out_dir)
             else:
-                include_file = asso.recipe.out_datgwl
-                logger.warning(f"Using absolute import for file {asso.recipe.out_datgwl}")
+                include_file = asso.include_file
+                logger.warning(f"Using absolute import for file {asso.include_file}")
 
             self.gwlhandler.add_command(cmds.Describe_include(str(include_file)))
             current_pos = printpos
@@ -302,7 +304,7 @@ class NanoscribeGdsHandler:
 
         export = self.out_dir.joinpath(fname)
 
-        self.gwlhandler.write_file(export)
+        self.gwlhandler.write_file(str(export))
 
     def print_all_nanoscribe_cells(self, ) -> None:
         """Print all the nanoscribe cells found by the handler"""

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from gdstk import Cell, Library
 
+
 class NanoscribeMatcher(ABC):
     @abstractmethod
     def __str__(self) -> str:
@@ -20,6 +21,7 @@ class NanoscribeMatcher(ABC):
     @abstractmethod
     def setup(self, library: Library) -> None:
         """Perform setup operations after creation of the object"""
+
 
 class LayerNumberMatcher(NanoscribeMatcher):
     def __init__(
@@ -54,13 +56,14 @@ class LayerNumberMatcher(NanoscribeMatcher):
         in its dependencies, return False otherwise.
         """
 
-        #Return True at the first matching object in the Cell.
+        # Return True at the first matching object in the Cell.
         for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
             if poly.layer == self.layer_num:
                 return True
 
-        #Else return False
+        # Else return False
         return False
+
 
 class LayerNumberDatatypeMatcher(NanoscribeMatcher):
     def __init__(
@@ -72,7 +75,7 @@ class LayerNumberDatatypeMatcher(NanoscribeMatcher):
         Warning: Untested.
         """
         self.layer_num = layer_num
-        self.datatype = 0
+        self.datatype = datatype
 
     def __str__(self) -> str:
         return f"LayerNumberDatatypeMatcher matching layer {self.layer_num}/{self.datatype}"
@@ -97,13 +100,14 @@ class LayerNumberDatatypeMatcher(NanoscribeMatcher):
         in its dependencies, return False otherwise.
         """
 
-        #Return True at the first matching object in the Cell.
+        # Return True at the first matching object in the Cell.
         for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
             if poly.layer == self.layer_num:
                 return True
 
-        #Else return False
+        # Else return False
         return False
+
 
 class PrintZoneCellMatcher(NanoscribeMatcher):
     def __init__(
@@ -128,12 +132,11 @@ class PrintZoneCellMatcher(NanoscribeMatcher):
 
         cellnames = [c.name for c in library.cells]
 
-        #Raise an error for empty libraries
-        if len(cellnames)==0:
+        # Raise an error for empty libraries
+        if len(cellnames) == 0:
             raise ValueError(f"""Empty gds library: {library}""")
 
-
-        #Look for cells with the correct name in the
+        # Look for cells with the correct name in the
         try:
             idx = cellnames.index(self.nanocellname)
             self._nanoscribe_cell = library.cells[idx]

@@ -163,23 +163,23 @@ class DescribeRecipe:
         if recipepath.exists():
             logger.debug(f"Warning: The file {recipepath} already exists and will be overwritten.")
 
-        #Bare name of the file
+        # Bare name of the file
         stl_filename = Path(self.recipe["Model.FilePath"]).stem
 
-        #String versions of paths for subprocess.
+        # String versions of paths for subprocess.
         recipestr = str(recipepath)
         describestr = str(describepath.resolve())
 
         self.write_recipe(recipestr)
 
-        #Slicing Command to Run
+        # Slicing Command to Run
         subp = f"\"{describestr}\" -p {recipestr}"
-        #Logging if requested
+        # Logging if requested
         logger.debug(f"Running subprocess: {subp}")
-        #Actual slicing
+        # Actual slicing
         _ = subprocess.run(subp)
 
-        #We check that everything exists.
+        # We check that everything exists.
         output_jobgwl = recipepath.parent.joinpath(
             f"{recipepath.stem}_{DESCRIBE_OUTPUT_SUFFIX}/{stl_filename}{DESCRIBE_OUTPUT_JOBGWL_SUFFIX}")
         output_datgwl = recipepath.parent.joinpath(

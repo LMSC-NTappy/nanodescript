@@ -6,7 +6,8 @@ from gdstk import Library, Cell
 
 from nanodescript.constants import TOPCELLNAME
 
-def find_stl_files(workpaths: Union[Path,list[Path]] = '.', recursive: bool = True) -> list[Path]:
+
+def find_stl_files(workpaths: Union[Path, list[Path]] = '.', recursive: bool = True) -> list[Path]:
     """find all stl files in a directory (recursively)"""
 
     if isinstance(workpaths, PurePath):
@@ -28,7 +29,8 @@ def find_stl_files(workpaths: Union[Path,list[Path]] = '.', recursive: bool = Tr
 
     return list(foundpath)
 
-def find_cell_by_name(library: Library, name: str) -> Union[Cell,bool]:
+
+def find_cell_by_name(library: Library, name: str) -> Union[Cell, bool]:
     """Find a cell with the input name in the input library.
     If a cell is found, the cell object is returned.
     If no cell is found, ValueError is raised.
@@ -40,6 +42,7 @@ def find_cell_by_name(library: Library, name: str) -> Union[Cell,bool]:
         raise ValueError(f"""No cell named {name} not found in gds library: {library}.""")
 
     return library.cells[idx]
+
 
 def find_topcell(library: Library) -> Cell:
     """Find the topcell using name matching. If only one cell is found at
