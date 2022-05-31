@@ -12,7 +12,7 @@ The name nanodescript comes from NanoScribe DeScribe Scripting.
 
 Warning: nanodescript is NOT a standalone stl slicer for nanoscribe printers. It relies
 on a DeScribe installation existing on the system for performing the slicing operation and visualising 
-the results. If you are interested in direct slicing of stl files, check out SamDehaeck's
+the results. If you are interested in python slicing of stl files, check out SamDehaeck's
 [TipSlicer](https://github.com/SamDehaeck/TipSlicer) project.
 
 ## Documentation
@@ -75,9 +75,9 @@ After installing nanodescript you run the following command in your anaconda pro
 ```
 
 This will read the `pattern.gds` file, look for nanoscribe print zones and stl files 
-(see search method below) in the library, create the `descript_output` directory 
-if it does not already exist and create a `library_job.gwl` file named after your library
-containing nanoscribe code.
+(see search method below) in the library, create the `descript_output` directory
+if it does not already exist. Then, it will create a `<library>_job.gwl` file named after your library
+containing nanoscribe-ready code.
 
 Then, you can open the library with DeScribe and generate the 3D preview to verify the output
 before running it.
@@ -101,25 +101,57 @@ A global print job is then generated automatically.
 Hereafter, we provide instructions for basic usage using the Command Line Interface. Advanced
 usage (API) is briefly explained and will be expanded on request.
 
-### GDS design requirements
+### GDS software requirements
 
 We recommend designing patterns either programmatically using gdstk, or
 using [KLayout](https://www.klayout.de/) since it's open source. In
 principle anything else such as L-edit should work.
 
-![Image of the ](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
-
-#### nanoscribe zone matching
+### nanoscribe cells and stl files matching
 
 To identify which cells are nanoscribe prints, the gds library file must contain a 
 cell named `nanoscribe_print_zone` (or a custom name can be changed by the user).
 
 Then, all cells which contain an instance of the `nanoscribe_print_zone` cell will be
-identified as nanoscribe print zones. The 
+identified as nanoscribe print zones. The following image shows an example pattern where
+a cross and a flat cone (tip) need to be printed in an array. Here, the cells 
+`cross_20_80` and `tip` both contain a `nanoscribe_print_zone` instance, which is
+a cell containing only a 100x100 um box displayed in pink. The box serves no other 
+purpose than informing the user and won't be printed. 
 
-#### stl file matching
+The other shapes in those cells (the cross and the circle) are the footprints of the structures 
+to be printed. Their role is also purely informative as well. However, attention should
+be paid at this stage about the center of the cells. The x-y origin of nanoscribe cells (0.0,0.0)
+should correspond to the origin of the .stl file. The X-Y-Z axes orientations should be identical as well.
 
-## Standard use
+This strategy (that I call print zone matching) is interesting for its simplicity. There is no 
+doubt about how the cell will behave in cascading dependencies. Other cell matching strategies 
+such as matching cells containing shapes of a specific layer/datatype combination are also 
+available but not directly supported in the CLI (API only). Those can be helpful to avoid bloating
+the gds library with print zones.
+
+To find stl files corresponding to the nanoscribe cells, the software will look for file named
+like the cells bearing the `.stl` extension. In the example, it will look for `cross_20_80.stl` and 
+`tip.stl` files. By default, the search path is in the directory (and sub-directories) of 
+the gds file, but other search paths can be added through the CLI (see help). stl files can
+also be associated _manually_ with cells using the API.
+
+![Demonstration pattern containing nanoscribe patterns.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true)
+
+### Describe Recipe Customisation
+
+The standard recipe applied for slicing `.stl` files is saved as a constant in the software.
+It can be accessed in the following way:
+
+```python
+import nanodescript
+nanodescript.DEFAULT_RECIPE
+```
+
+However, upon slicing files in a project, 
+
+
+## Standard usage
 
 Standard usage is provided using the command line interface. 
 
