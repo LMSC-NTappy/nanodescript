@@ -17,6 +17,8 @@ def main():
                                      epilog='This command line interface only provides basic functionality. Check '
                                             'documentation and contact author for more information.')
 
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+
     parser.add_argument("gds",
                         nargs=1,
                         type=Path,
@@ -27,11 +29,12 @@ def main():
                         type=Path,
                         help='directory for output files')
 
-    parser.add_argument("--describe_dir",
+    parser.add_argument("--describe_exe",
                         nargs=1,
                         type=Path,
                         default=None,
-                        help='Installation directory for Describe', )
+                        help= 'Path to the describe installation. '
+                              'Default C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe',)
 
     parser.add_argument("--stl", "-s",
                         nargs="*",
@@ -39,7 +42,7 @@ def main():
                         action='store',
                         default=None,
                         help='Use this option to add Paths where stl files are searched. By default, stl files are'
-                             'searched in the gds file directory and sub-directories. \n',
+                             'searched in the directory and sub-directories of the gds files.',
                         )
 
     parser.add_argument('--nonrecursive', '-nr',

@@ -217,7 +217,7 @@ class NanoscribeGdsHandler:
             self.process_cell(asso)
 
     def process_cell(self, cell_association: CellAssociation) -> None:
-        """Process A Nanoscribe cell using the current recipe. """
+        """Process A nanoscribe cell using the current recipe. """
 
         self.describerecipe.process_stl(cell_association.stl_file, cell_association.transformation)
 
