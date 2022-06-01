@@ -8,7 +8,7 @@ import numpy as np
 from gdstk import Library, read_gds, Cell
 from tqdm import tqdm
 
-from nanodescript.constants import NANOSCRIBEPROPERTY, STLPROPERTY, DESCRIBE_DEFAULT_PATH
+from nanodescript.config import nanodescript_config
 from nanodescript.nanoscribematcher import NanoscribeMatcher, PrintZoneCellMatcher
 from nanodescript.cell_transformation import CellTransformation
 from nanodescript.cell_association import CellAssociation
@@ -29,7 +29,7 @@ class NanoscribeGdsHandler:
             out_dir: Path,
             matcher: NanoscribeMatcher = PrintZoneCellMatcher(),
             describerecipe: DescribeRecipe = DescribeRecipe(),
-            describepath: Path = Path(DESCRIBE_DEFAULT_PATH),
+            describepath: Path = Path(nanodescript_config.get('paths', 'describe')),
             gwlhandler: GwlHandler = GwlHandler(),
     ) -> None:
         """Initialise a gds manager object"""
@@ -92,38 +92,39 @@ class NanoscribeGdsHandler:
         cells = self.library.cells
         for cell in cells:
             if self.matcher.match_cell(cell):
-                cell.set_property(NANOSCRIBEPROPERTY, True)
+                cell.set_property(nanodescript_config.get('identifiers', 'is_nanoscribe'), True)
             else:
-                cell.set_property(NANOSCRIBEPROPERTY, False)
+                cell.set_property(nanodescript_config.get('identifiers', 'is_nanoscribe'), False)
 
     def set_nanoscribe_cell(self, cell: Cell, isnanoscribe: bool):
         """Set the property of a cell as nanoscribe"""
         if cell in self.library.cells:
-            cell.set_property(NANOSCRIBEPROPERTY, isnanoscribe)
+            cell.set_property(nanodescript_config.get('identifiers', 'is_nanoscribe'), isnanoscribe)
         else:
             raise AttributeError(f'cell {cell}: {cell.name} not in library {self.library}: {self.library.name}')
 
     def reset_nanoscribe_cells(self) -> None:
         """Set all cells as non-nanoscribe"""
         for cell in self.library.cells:
-            cell.set_property(NANOSCRIBEPROPERTY, False)
+            cell.set_property(nanodescript_config.get('identifiers', 'is_nanoscribe'), False)
 
     def get_nanoscribe_cells(self) -> list[Cell]:
         """Return all the nanoscribe cells in the library"""
         ns_cells = []
 
-        is_set = [c.get_property(NANOSCRIBEPROPERTY) is not None for c in self.library.cells]
+        is_set = [c.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))
+                  is not None for c in self.library.cells]
 
         # First check if the cells are actually nanoscribe
         if not all(is_set):
             raise RuntimeError(f'Library {self.library.name} contains cells where the property '
-                               f'{NANOSCRIBEPROPERTY} associated with nanoscribe cells '
-                               f'is not set.')
+                               f'{nanodescript_config.get("identifiers", "is_nanoscribe")} associated '
+                               f'with nanoscribe cells is not set.')
 
         # Then, output a list of all cells evaluating Nanoscribe as true.
         for cell in self.library.cells:
-            if cell.get_property(NANOSCRIBEPROPERTY)[0]:
-                ns_cells.append(cell)
+            if cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))[0]:
+                    ns_cells.append(cell)
         return ns_cells
 
     def match_stl_files(self, stlpaths: list[Path] = None) -> None:
@@ -131,8 +132,8 @@ class NanoscribeGdsHandler:
         is given as args, will look recursively for stl files in the current directory."""
 
         # Check if the nanoscribe property is set in the cells
-        if self.library.cells[0].get_property(NANOSCRIBEPROPERTY) is None:
-            raise ValueError('Nanoscribe property not set in the library. Try running find_nanoscribe_cells() first')
+        if self.library.cells[0].get_property(nanodescript_config.get('identifiers', 'is_nanoscribe')) is None:
+                raise ValueError('Nanoscribe property not set in the library. Try running find_nanoscribe_cells() first')
 
         # If no paths passed in argument try to find them
         if stlpaths is None:
@@ -142,19 +143,19 @@ class NanoscribeGdsHandler:
 
         # Set cells properties to associate with stuff
         for cell in self.library.cells:
-            if cell.get_property(NANOSCRIBEPROPERTY) == [1]:
+            if cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe')) == [1]:
                 try:
                     idx = names.index(cell.name)
-                    cell.set_property(STLPROPERTY, str(stlpaths[idx].resolve()))
+                    cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'), str(stlpaths[idx].resolve()))
                 except ValueError:
-                    cell.set_property(STLPROPERTY, 'STL_NOT_FOUND')
+                    cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'), 'STL_NOT_FOUND')
             else:
-                cell.set_property(STLPROPERTY, 'NOT_NANOSCRIBE')
+                cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'), 'NOT_NANOSCRIBE')
 
     def get_cells_matched_with_stl_files(self) -> list[tuple]:
         nsc_stl_matches = []
         for cell in self.library.cells:
-            prop = cell.get_property(STLPROPERTY)
+            prop = cell.get_property(nanodescript_config.get('identifiers', 'stl_file_path'))
             if prop is not None:
                 prop = prop[0].decode()
                 if prop not in ['STL_NOT_FOUND', 'NOT_NANOSCRIBE']:
@@ -179,7 +180,7 @@ class NanoscribeGdsHandler:
             current_transformation = queue_of_transformations.pop(0)
 
             # Check if queued cell is a nanoscribe cell
-            current_prop = current_cell.get_property(NANOSCRIBEPROPERTY)
+            current_prop = current_cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))
             if current_prop is not None and current_prop[0]:
                 # Append it to the ones that need printing
                 asso = CellAssociation(current_cell, current_transformation)
@@ -206,7 +207,7 @@ class NanoscribeGdsHandler:
     def add_stl_files_to_associations(self):
         """Process the cells with"""
         for asso in self.nanoscribe_cells_associations:
-            stl = asso.cell.get_property(STLPROPERTY)[0].decode()
+            stl = asso.cell.get_property(nanodescript_config.get('identifiers', 'stl_file_path'))[0].decode()
             if stl not in ['STL_NOT_FOUND', 'NOT_NANOSCRIBE']:
                 asso.stl_file = Path(stl)
 

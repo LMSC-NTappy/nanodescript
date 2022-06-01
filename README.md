@@ -17,14 +17,14 @@ the results. If you are interested in python slicing of stl files, check out Sam
 
 ## Documentation
 
-This is it. This should get you started, for more information I let you explore the code a bit yourself,
+This is it. It should get you started, for more information I let you explore the code a bit yourself,
 and if you don't find what you need or still have questions you can always ask me a question.
 
 ## Installation
 
 Warning! Without a valid DeScribe installation on the system, nanodescript will not work.
 
-We recommend installing nanodescript in a conda environment.
+We recommend installing nanodescript in a [conda](https://docs.conda.io/en/latest/) environment.
 The reason for this is that [gdstk](https://heitzmann.github.io/gdstk/) is used for the
 manipulation of gdsII files, and does not support pip installation. It must be installed
 manually beforehand using conda.
@@ -38,15 +38,10 @@ conda config --env --set channel_priority strict
 conda install gdstk
 ```
 
-Other dependencies will be installed automatically when installing nanodescript
+Other dependencies will be installed automatically when installing nanodescript.
 
-```bash
-# Hopefully this works at some point
-pip install nanodescript
-```
-
-From source, nanodescript can be installed by downloading the github repository, and
-running the pip install command from the extracted directory (use -e for a local installation):
+For now, nanodescript can be installed only from source by downloading the github repository, and
+running the pip install command from the extracted directory (use -e for dev-mode installation):
 
 ```bash
 pip install .
@@ -56,12 +51,6 @@ Running tests further require installing pytest (manually for now)
 
 ```bash
 pip install pytest
-```
-
-or 
-
-```bash
- conda install -c anaconda pytest 
 ```
 
 ## Usage
@@ -148,25 +137,7 @@ import nanodescript
 nanodescript.DEFAULT_RECIPE
 ```
 
-However, upon slicing files in a project, 
-
-
-## Standard usage
-
-Standard usage is provided using the command line interface. 
-
-```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
-```
+It can be customized during execution using the `--recipe` option. See 
 
 ## Bugs
 

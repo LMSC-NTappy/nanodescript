@@ -4,8 +4,9 @@ import logging
 
 from nanodescript.stl_handler import StlFile
 from nanodescript.cell_transformation import CellTransformation
+from nanodescript.config import nanodescript_config
 
-from nanodescript.constants import DESCRIBE_DEFAULT_PATH, DEFAULT_RECIPE, DESCRIBE_OUTPUT_SUFFIX, \
+from nanodescript.constants import DEFAULT_RECIPE, DESCRIBE_OUTPUT_FOLDER_SUFFIX, \
     DESCRIBE_OUTPUT_JOBGWL_SUFFIX, DESCRIBE_OUTPUT_DATGWL_SUFFIX, DESCRIBE_OUTPUT_FILES_SUFFIX, \
     DESCRIBE_OUTPUT_RECIPE_SUFFIX
 
@@ -21,7 +22,7 @@ class DescribeRecipe:
         if recipe_file is not None:
             self.recipe = self._recipe_from_file(recipe_file)
         else:
-            self.recipe = DEFAULT_RECIPE
+            self.recipe = self._recipe_from_config()
 
         self.out_datgwl: Path = None  # output gwl file with the data
         self.out_jobgwl: Path = None  # output gwl file with the full job
@@ -109,8 +110,20 @@ class DescribeRecipe:
         self.update_recipe("Model.Scaling", scalingstring)
         self.update_recipe("Model.Translation", "X:0 Y:0 Z:0")
 
+    def _recipe_from_config(self,) -> dict:
+        """Return the recipe from the configuration file"""
+        config_recipe = nanodescript_config['default_recipe']
+
+        resdict = {}
+
+        for key, val in config_recipe.items()\
+                :
+            casted = self._cast_recipe_key_val(key, val)
+            resdict.update(casted)
+        return resdict
+
     def _recipe_from_file(self, recipe_file: Path) -> dict:
-        """ Sets the recipe from a file"""
+        """Sets the recipe from a file"""
         resdict = {}
         # Open file
         with open(recipe_file) as f:
@@ -119,20 +132,31 @@ class DescribeRecipe:
             for line in lines:
                 # Split the entry from the variable
                 lsplit = [ll.strip() for ll in line.split('=')]
-                # Check if entry is in the default character, in which case cast the variable into default recipe type
-                if self.check_recipe_field(lsplit[0]):
-                    # Getting the type of the recipe field
-                    field_type = type(DEFAULT_RECIPE[lsplit[0]])
-                    # If the recipe field is bool, we need to handle the problem of converting str to bool
-                    if field_type == bool:
-                        resdict[lsplit[0]] = self._strtobool(lsplit[1])
-                    # Otherwise cast
-                    else:
-                        resdict[lsplit[0]] = field_type(lsplit[1])
-                # Otherwise raise an error
-                else:
-                    raise ValueError(f"{recipe_file} contains line {line} which is not a valid Describe Recipe line")
+                # Check if entry is in the default, in which case cast the variable into default recipe type
+                casted = self._cast_recipe_key_val(lsplit[0], lsplit[1])
+                resdict.update(casted)
+
         return resdict
+
+    def _cast_recipe_key_val(self, recipe_key, recipe_val) -> dict:
+        """Cast a key and val pair into the type defined in constants.DEFAULT_RECIPE.
+        Raise ValueError if the field does not belong in the nanoscribe default recipe."""
+        casted = {}
+        # Check if the key is in the default recipe, in which case cast the variable type
+        if self.check_recipe_field(recipe_key):
+            # Getting the type of the default recipe field
+            field_type = type(DEFAULT_RECIPE[recipe_key])
+            # If the recipe field is bool, we need to handle the problem of converting str to bool
+            if field_type == bool:
+                casted[recipe_key] = self._strtobool(recipe_val)
+            # Otherwise cast
+            else:
+                casted[recipe_key] = field_type(recipe_val)
+        # Otherwise raise an error
+        else:
+            raise ValueError(f"{recipe_key} is not a valid Describe Recipe line")
+        
+        return casted
 
     def write_recipe(self, f: str) -> None:
         """Save the recipe as a file"""
@@ -143,7 +167,7 @@ class DescribeRecipe:
                 r.write(f"{key} = {val} \n")
 
     def generate_gwl_code(self, tmp_recipe: Path,
-                          describepath: Path = Path(DESCRIBE_DEFAULT_PATH),
+                          describepath: Path = Path(nanodescript_config.get("paths", "describe")),
                           ) -> None:  # (str, str, str, str):
         """Generate the GWL code from the current recipe."""
 
@@ -181,13 +205,13 @@ class DescribeRecipe:
 
         # We check that everything exists.
         output_jobgwl = recipepath.parent.joinpath(
-            f"{recipepath.stem}_{DESCRIBE_OUTPUT_SUFFIX}/{stl_filename}{DESCRIBE_OUTPUT_JOBGWL_SUFFIX}")
+            f"{recipepath.stem}_{DESCRIBE_OUTPUT_FOLDER_SUFFIX}/{stl_filename}_{DESCRIBE_OUTPUT_JOBGWL_SUFFIX}")
         output_datgwl = recipepath.parent.joinpath(
-            f"{recipepath.stem}_{DESCRIBE_OUTPUT_SUFFIX}/{stl_filename}{DESCRIBE_OUTPUT_DATGWL_SUFFIX}")
+            f"{recipepath.stem}_{DESCRIBE_OUTPUT_FOLDER_SUFFIX}/{stl_filename}_{DESCRIBE_OUTPUT_DATGWL_SUFFIX}")
         output_recipe = recipepath.parent.joinpath(
-            f"{recipepath.stem}_{DESCRIBE_OUTPUT_SUFFIX}/{stl_filename}{DESCRIBE_OUTPUT_RECIPE_SUFFIX}")
+            f"{recipepath.stem}_{DESCRIBE_OUTPUT_FOLDER_SUFFIX}/{stl_filename}_{DESCRIBE_OUTPUT_RECIPE_SUFFIX}")
         output_files = recipepath.parent.joinpath(
-            f"{recipepath.stem}_{DESCRIBE_OUTPUT_SUFFIX}/{stl_filename}{DESCRIBE_OUTPUT_FILES_SUFFIX}")
+            f"{recipepath.stem}_{DESCRIBE_OUTPUT_FOLDER_SUFFIX}/{stl_filename}_{DESCRIBE_OUTPUT_FILES_SUFFIX}")
 
         # Perform checks that all expected output files have been created.
         checks = [(output_jobgwl.exists() & output_jobgwl.is_file()),

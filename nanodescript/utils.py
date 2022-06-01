@@ -4,7 +4,7 @@ from typing import Union
 
 from gdstk import Library, Cell
 
-from nanodescript.constants import TOPCELLNAME
+from nanodescript.constants import TOPCELLNAME, DESCRIBE_DEFAULT_PATH, DEFAULT_RECIPE
 
 
 def find_stl_files(workpaths: Union[Path, list[Path]] = '.', recursive: bool = True) -> list[Path]:

@@ -1,17 +1,18 @@
+# This is either smart or very stupid, but this file serves as a hardcoded set of defaults for setting
+# or resetting the configuration file of this project. It also provides some special functionality such as
+# type definition whereas the configparser only provides strings.
+
 TOPCELLNAME = "topcell"  # Name match should be only lowercase alphabetic
 NANOSCRIBEPROPERTY = 'is_nanoscribe'
 STLPROPERTY = 'stl_file_path'
-
-COMMENT_CHAR = '%'
+DESCRIBE_DEFAULT_PATH = 'C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe'
 
 # Default installation path for describe
-DESCRIBE_TMP_RECIPE_SUFFIX = "tmp.recipe"
-DESCRIBE_DEFAULT_PATH = 'C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe'
-DESCRIBE_OUTPUT_SUFFIX = "output"
-DESCRIBE_OUTPUT_DATGWL_SUFFIX = "_data.gwl"
-DESCRIBE_OUTPUT_JOBGWL_SUFFIX = "_job.gwl"
-DESCRIBE_OUTPUT_RECIPE_SUFFIX = "_job.recipe"
-DESCRIBE_OUTPUT_FILES_SUFFIX = "_files"
+DESCRIBE_OUTPUT_FOLDER_SUFFIX = "output"
+DESCRIBE_OUTPUT_DATGWL_SUFFIX = "data.gwl"
+DESCRIBE_OUTPUT_JOBGWL_SUFFIX = "job.gwl"
+DESCRIBE_OUTPUT_RECIPE_SUFFIX = "job.recipe"
+DESCRIBE_OUTPUT_FILES_SUFFIX = "files"
 
 # The default recipe contains all default configurations but no model
 DEFAULT_RECIPE = {

@@ -7,6 +7,8 @@ from nanodescript.describe_gds_handler import NanoscribeGdsHandler
 from nanodescript.nanoscribematcher import PrintZoneCellMatcher
 from nanodescript.utils import find_stl_files, find_topcell, find_cell_by_name
 
+from nanodescript.config import nanodescript_config as conf
+
 logger = logging.getLogger()
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
@@ -35,6 +37,13 @@ def main():
                         default=None,
                         help= 'Path to the describe installation. '
                               'Default C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe',)
+
+    parser.add_argument('--set_describe_path',
+                        nargs = 1,
+                        type = Path,
+                        default = None,
+                        help='Use this option to change the describe.exe path in the config file'
+                        )
 
     parser.add_argument("--stl", "-s",
                         nargs="*",
@@ -75,6 +84,10 @@ def main():
                         help='Use this option to change the base recipe used in slicing stl files.'
                         )
 
+    parser.add_argument('--config_file_path', '-c',
+                        action='store_true',
+                        help='display the config file location and exit.')
+
     # parse the arguments from standard input
     args = parser.parse_args()
 
@@ -84,6 +97,17 @@ def main():
         logger.setLevel(level=logging.INFO)
     if args.verbose >= 2:
         logger.setLevel(level=logging.DEBUG)
+
+    if args.config_file_path:
+        print(conf.get_config_path())
+        quit()
+
+    if args.set_describe_path is not None:
+        newpath = args.set_describe_path[0].resolve()
+        if newpath.exists() and newpath.is_file():
+            conf.edit_config('paths', 'describe', newpath, also_save=True)
+            logger.info(f"Describe Path changed to {newpath}")
+            quit()
 
     logger.info("Initialising Nanoscribe Descript Session")
     logger.info("----------------------------------------")
@@ -97,8 +121,8 @@ def main():
     gdsman = NanoscribeGdsHandler(library=args.gds[0], out_dir=args.out_dir[0])
 
     # Update the path to describe.exe if needed
-    if args.describe_dir is not None:
-        gdsman.describepath = args.describe_dir
+    if args.describe_exe is not None:
+        gdsman.describepath = args.describe_dir[0]
 
     logger.debug(f"Describe executable directory: {gdsman.describepath.resolve()}")
 

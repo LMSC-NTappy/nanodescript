@@ -3,8 +3,6 @@ import re
 from typing import Union
 import warnings
 
-from nanodescript.constants import COMMENT_CHAR
-
 
 # Abstract Base Class for Nanoscribe commands
 class DescribeCommand(ABC):
@@ -1450,7 +1448,7 @@ class Comment(DescribeCommand):
         self.cmtline = cmt
 
     def __str__(self):
-        return f"{COMMENT_CHAR} {self.cmtline}"
+        return f"% {self.cmtline}"
 
 
 # Commands designators for parsing.
@@ -1462,7 +1460,7 @@ def _build_commands_dictionary():
         if shortname.startswith('Describe'):
             shortname = shortname[len('Describe'):]
         elif shortname == 'Comment':
-            shortname = COMMENT_CHAR
+            shortname = "%"
         result_dict.update({shortname: s})
     return result_dict
 

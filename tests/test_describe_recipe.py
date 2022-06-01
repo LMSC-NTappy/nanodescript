@@ -6,6 +6,7 @@ from pathlib import Path
 
 here_path = Path(__file__).parent
 
+
 class TestGwlHandler:
     def setup_class(self):
         self.t = DescribeRecipe()
@@ -60,8 +61,7 @@ class TestGwlHandler:
 
         assert self.t.recipe == DescribeRecipe(recipe_file=ref_recipe_file).recipe
 
-    def \
-            test_generate_gwl(self, tmp_path):
+    def test_generate_gwl(self, tmp_path):
         gwl_file_loc = tmp_path.joinpath('tmp')
 
         self.t.generate_gwl_code(tmp_recipe=gwl_file_loc)
