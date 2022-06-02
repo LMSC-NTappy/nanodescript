@@ -140,7 +140,7 @@ This strategy matches all cells that contain polygons, paths or labels of a cert
 In the example below, the nanoscribe layer is number 66, here again both `cross_20_80` and `tip`
 are matched.
 
-![Demonstration of a pattern containing nanoscribe layers and datatypes.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern_layer.PNG?raw=true)
+![Demonstration of a pattern containing nanoscribe layers and datatypes.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern_layer.PNG)
 
 After running the following command outputs the same result as the print zone matcher
 
@@ -148,7 +148,8 @@ After running the following command outputs the same result as the print zone ma
 nanodescript test_pattern_printzone.gds gds_slicing_output --matcher layermatcher
 ```
 
-![Output of the layer matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layer.PNG?raw=true)
+![Output of the layer matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layer.PNG)
+
 
 #### layer/datatype matching
 
