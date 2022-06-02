@@ -43,13 +43,24 @@ class TestGwlHandler:
         assert p.exists()
 
     def test_sections(self):
-        assert conf.sections() == ['paths', 'identifiers', 'default_recipe', 'describe_output_suffixes']
+        assert conf.sections() == ['paths',
+                                   'identifiers',
+                                   'describe_output_suffixes',
+                                   'gds_handler',
+                                   'layermatcher',
+                                   'layerdatatypematcher',
+                                   'printzonematcher',
+                                   'default_recipe']
 
     @pytest.mark.parametrize('input_section,expected_options',
                              [('paths', ['describe']),
-                              ('identifiers', ['topcell', 'is_nanoscribe', 'stl_file_path']),
+                              ('identifiers', ['is_nanoscribe', 'stl_file_path']),
+                              ('describe_output_suffixes', ['folder', 'datgwl', 'jobgwl', 'recipe', 'files']),
+                              ('gds_handler', ['topcell', 'matcher']),
+                              ('layermatcher', ['layer_number']),
+                              ('layerdatatypematcher', ['layer_number', 'datatype_number']),
+                              ('printzonematcher', ['printzone_name']),
                               ('default_recipe', list(DEFAULT_RECIPE.keys())),
-                              ('describe_output_suffixes', ['folder', 'datgwl', 'jobgwl', 'recipe', 'files'])
                               ])
     def test_options(self, input_section, expected_options):
         assert conf.options(input_section) == expected_options
@@ -72,21 +83,21 @@ class TestGwlHandler:
         with pytest.raises(NoSectionError):
             conf.edit_config('anonymizers', 'bottomcell', 'ttcc')
 
-        conf.edit_config('identifiers', 'topcell', 'TC')
+        conf.edit_config('gds_handler', 'topcell', 'TC')
 
-        assert conf['identifiers']['topcell'] == 'TC'
+        assert conf['gds_handler']['topcell'] == 'TC'
 
         conf.reset_config()
 
-        assert conf['identifiers']['topcell'] == 'topcell'
+        assert conf['gds_handler']['topcell'] == 'topcell'
 
     def test_save_config(self):
         conf.reset_config()
 
-        conf.edit_config('identifiers', 'topcell', 'TC', also_save=True)
+        conf.edit_config('gds_handler', 'topcell', 'TC', also_save=True)
 
         conf.reload_config()
 
-        assert conf['identifiers']['topcell'] == 'TC'
+        assert conf['gds_handler']['topcell'] == 'TC'
 
         conf.reset_config()

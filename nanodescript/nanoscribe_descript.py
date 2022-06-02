@@ -4,7 +4,7 @@ import logging
 import sys
 
 from nanodescript.describe_gds_handler import NanoscribeGdsHandler
-from nanodescript.nanoscribematcher import PrintZoneCellMatcher
+from nanodescript.nanoscribe_matchers import PrintZoneMatcher, get_matcher_by_name, get_all_matchers_names
 from nanodescript.utils import find_stl_files, find_topcell, find_cell_by_name
 
 from nanodescript.config import nanodescript_config as conf
@@ -14,10 +14,10 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 def main():
-    parser = argparse.ArgumentParser(prog='nanoscribe_descript',
+    parser = argparse.ArgumentParser(prog='nanodescript_CLI',
                                      description='Nanoscribe code generation from gds libraries and stl files',
                                      epilog='This command line interface only provides basic functionality. Check '
-                                            'documentation and contact author for more information.')
+                                            'documentation or contact author for more information.')
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
 
@@ -31,19 +31,26 @@ def main():
                         type=Path,
                         help='directory for output files')
 
-    parser.add_argument("--describe_exe",
-                        nargs=1,
-                        type=Path,
-                        default=None,
-                        help= 'Path to the describe installation. '
-                              'Default C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe',)
+    parser.add_argument('--config', '-c',
+                        action='version',
+                        version=str(conf.get_config_path()),
+                        help='show nanodescript_config.ini location and exit')
 
-    parser.add_argument('--set_describe_path',
-                        nargs = 1,
-                        type = Path,
-                        default = None,
-                        help='Use this option to change the describe.exe path in the config file'
-                        )
+    parser.add_argument("--describe", "-d",
+                        action='version',
+                        version=conf.get('paths', 'describe'),
+                        help='show DeScribe.exe location configured in nanodescript_config.ini and exit')
+
+    parser.add_argument('--topcell', '-t',
+                        nargs='?',
+                        help='Override the topcell name set in nanodescript_config.ini',
+                        default=None)
+
+    parser.add_argument('--matcher', '-m',
+                        nargs=1,
+                        help='Override the matcher set in nanodescript_config.ini',
+                        default=conf.get('gds_handler','matcher'))
+
 
     parser.add_argument("--stl", "-s",
                         nargs="*",
@@ -56,17 +63,13 @@ def main():
 
     parser.add_argument('--nonrecursive', '-nr',
                         action='store_true',
-                        help="Use this flag to disable searching stl files in sub directories as well.\n",
+                        help="Use this flag to disable recursive search of stl files",
                         )
 
-    parser.add_argument('--topcell', '-t',
-                        nargs='?',
-                        help='Manually set the topcell. By default, automatic identification is attempted.\n',
-                        default=None)
 
     parser.add_argument('--verbose', '-v',
                         action='count',
-                        help='Use this flag for verbose operation, use -vv for very verbose operation (debug).\n',
+                        help='Use this flag for verbose operation, use -vv for very verbose operation (debug)\n',
                         default=0)
 
     parser.add_argument('--origin', '-o',
@@ -75,18 +78,14 @@ def main():
                         default=[0.0, 0.0],
                         help="Use this option to shift the print pattern origin by the specified amounts in X "
                              "and Y in um. EG, if -o 30.0 50.0 is used, the X=30.0 Y=50.0 um point of the gds pattern "
-                             "will be used as the nanoscribe X=0.0, Y=0.0 position.\n")
+                             "will be used as the nanoscribe X=0.0, Y=0.0 position\n")
 
     parser.add_argument('--recipe', '-r',
                         nargs=1,
                         type=Path,
                         default=None,
-                        help='Use this option to change the base recipe used in slicing stl files.'
+                        help='Use this option to override the slicing recipe stored in nanodescript_config.ini'
                         )
-
-    parser.add_argument('--config_file_path', '-c',
-                        action='store_true',
-                        help='display the config file location and exit.')
 
     # parse the arguments from standard input
     args = parser.parse_args()
@@ -98,17 +97,6 @@ def main():
     if args.verbose >= 2:
         logger.setLevel(level=logging.DEBUG)
 
-    if args.config_file_path:
-        print(conf.get_config_path())
-        quit()
-
-    if args.set_describe_path is not None:
-        newpath = args.set_describe_path[0].resolve()
-        if newpath.exists() and newpath.is_file():
-            conf.edit_config('paths', 'describe', newpath, also_save=True)
-            logger.info(f"Describe Path changed to {newpath}")
-            quit()
-
     logger.info("Initialising Nanoscribe Descript Session")
     logger.info("----------------------------------------")
     logger.info(f"GDS Library: {args.gds[0]}")
@@ -117,12 +105,15 @@ def main():
     logger.debug(f"resolved path: {args.out_dir[0].resolve()}")
     logger.info("----------------------------------------")
 
-    # Initialise gds handler
-    gdsman = NanoscribeGdsHandler(library=args.gds[0], out_dir=args.out_dir[0])
 
-    # Update the path to describe.exe if needed
-    if args.describe_exe is not None:
-        gdsman.describepath = args.describe_dir[0]
+    # Initialise gds handler
+    gdsman = NanoscribeGdsHandler(library=args.gds[0],
+                                  out_dir=args.out_dir[0],
+                                  )
+
+    # # Update the path to describe.exe if needed
+    # if args.describe_exe is not None:
+    #     gdsman.describepath = args.describe_dir[0]
 
     logger.debug(f"Describe executable directory: {gdsman.describepath.resolve()}")
 
@@ -135,34 +126,39 @@ def main():
         logger.debug('Attempting to discover topcell in library')
         topcell = find_topcell(gdsman.library)
     else:
-        # logging.info(f'Set topcell to: {args.topcell}')
         topcell = find_cell_by_name(gdsman.library, args.topcell[0])
-        # logging.debug(f'cell address: {topcell}')
 
     logging.info(f'topcell set to: {topcell.name}')
     logging.debug(f"cell address: {topcell}")
 
     gdsman.assign_topcell(topcell)
-
-    # Initialise a nanoscribe cell matcher
-    cellmatcher = PrintZoneCellMatcher()
-    gdsman.set_matcher(cellmatcher)
+    # A priori not useful anymore
+    # # Initialise a nanoscribe cell matcher
+    # cellmatcher = PrintZoneMatcher()
+    # gdsman.set_matcher(cellmatcher)
     logging.info(f'Matcher set to: {cellmatcher}')
     logger.info("----------------------------------------")
 
     # Perform Cell matching
     gdsman.find_nanoscribe_cells()
-    # If requested, log matching results
+
+    # If requested, log matching results.
+    # The if statement is only here to prevent execution of code if
+    # not very verbose. A bit overkill but does not harm...
     if logger.getEffectiveLevel() < 20:
         cells_found = gdsman.get_nanoscribe_cells()
         for c in cells_found:
             logging.debug(f"Nanoscribe Cell: {c}")
 
-    # Searching for stl files
+    # Searching for stl files. The search directory is the
+    # gds library parent directory by default. This could
+    # probably be a default value of the parsing but IDK if
+    # that's going to work since the stl and gds args are parsed at the same time.
     if args.stl is None:
         args.stl = [args.gds[0].parent]
+
     logger.info(f"stl files searched in: {args.stl}")
-    logger.info(f"stl files recursive: {not args.nonrecursive}")
+    logger.info(f"stl  recursive search: {not args.nonrecursive}")
 
     recursive = not args.nonrecursive
     stls = find_stl_files(args.stl, recursive=recursive)
@@ -170,7 +166,9 @@ def main():
 
     # Perform stl matching
     gdsman.match_stl_files(stlpaths=stls)
-    # If requested, log results
+
+    # If requested, log results.  There again prevent evaluation
+    # if logger level is not verbose enough. Overkill again...
     if logger.getEffectiveLevel() < 20:
         logging.debug('STL Matches:')
         stl_cell_match = gdsman.get_cells_matched_with_stl_files()
@@ -194,7 +192,6 @@ def main():
     logger.info(f"Origin of print: {gdsman.print_origin}")
     gdsman.create_print_job()
     gdsman.export_print_job()
-
 
 if __name__ == "__main__":
     main()

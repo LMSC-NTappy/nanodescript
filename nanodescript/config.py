@@ -7,9 +7,11 @@ import nanodescript.constants as cst
 
 __all__ = ['nanodescript_config']
 
+
 class CaseConfigParser(SafeConfigParser):
     def optionxform(self, optionstr):
         return optionstr
+
 
 class NanodescriptConfig:
     def __init__(self, ):
@@ -31,14 +33,13 @@ class NanodescriptConfig:
     def _get_default_config() -> CaseConfigParser:
         """Get the default Config Parser"""
         config = CaseConfigParser()
-        config.optionxform = str
 
         config['paths'] = {'describe': cst.DESCRIBE_DEFAULT_PATH}
-        config['identifiers'] = {'topcell': cst.TOPCELLNAME,
-                                 'is_nanoscribe': cst.NANOSCRIBEPROPERTY,
-                                 'stl_file_path': cst.STLPROPERTY}
 
-        config['default_recipe'] = cst.DEFAULT_RECIPE
+        config['identifiers'] = {
+            'is_nanoscribe': cst.NANOSCRIBEPROPERTY,
+            'stl_file_path': cst.STLPROPERTY
+        }
 
         config['describe_output_suffixes'] = {
             'folder': cst.DESCRIBE_OUTPUT_FOLDER_SUFFIX,
@@ -48,7 +49,30 @@ class NanodescriptConfig:
             'files': cst.DESCRIBE_OUTPUT_FILES_SUFFIX
         }
 
+        config['gds_handler'] = {
+            'topcell': cst.TOPCELLNAME,
+            'matcher': cst.MATCHER_NAME,
+        }
+
+        config['layermatcher'] = {
+            'layer_number': cst.LAYER_NUMBER,
+        }
+
+        config['layerdatatypematcher'] = {
+            'layer_number': cst.LAYER_NUMBER,
+            'datatype_number': cst.DATATYPE_NUMBER,
+        }
+
+        config['printzonematcher'] = {
+            'printzone_name': cst.PRINTZONE_NAME
+        }
+
+        config['default_recipe'] = cst.DEFAULT_RECIPE
+
         return config
+
+    def get_default_recipe(self):
+        return dict(self.config['default_recipe'])
 
     def load_config(self) -> CaseConfigParser:
         """Load the configuration file. Also create it

@@ -116,8 +116,7 @@ class DescribeRecipe:
 
         resdict = {}
 
-        for key, val in config_recipe.items()\
-                :
+        for key, val in config_recipe.items():
             casted = self._cast_recipe_key_val(key, val)
             resdict.update(casted)
         return resdict

@@ -4,7 +4,7 @@ from typing import Union
 
 from gdstk import Library, Cell
 
-from nanodescript.constants import TOPCELLNAME, DESCRIBE_DEFAULT_PATH, DEFAULT_RECIPE
+from nanodescript.config import nanodescript_config as conf
 
 
 def find_stl_files(workpaths: Union[Path, list[Path]] = '.', recursive: bool = True) -> list[Path]:
@@ -61,7 +61,7 @@ def find_topcell(library: Library) -> Cell:
                     stdnames]  # substitute empty str for all matches
         stdnames = [name.lower() for name in stdnames]  # convert remaining
         try:
-            idx = stdnames.index(TOPCELLNAME)
+            idx = stdnames.index(conf.get('identifiers', 'topcell'))
         except ValueError:
             # No value is found
             raise ValueError(f"""No topcell found in top level cells:

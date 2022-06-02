@@ -1,6 +1,6 @@
 from nanodescript.describe_gds_handler import NanoscribeGdsHandler
 from nanodescript.constants import DEFAULT_RECIPE
-from nanodescript.nanoscribematcher import PrintZoneCellMatcher
+from nanodescript.nanoscribe_matchers import PrintZoneMatcher
 from nanodescript.utils import find_topcell
 
 from pathlib import Path
@@ -44,7 +44,7 @@ class TestNanoscribeGdsHandler:
         assert self.t_h.describerecipe.recipe == DEFAULT_RECIPE
         assert self.t_h.topcell is None
 
-        matcher = PrintZoneCellMatcher()
+        matcher = PrintZoneMatcher()
         self.t_h.set_matcher(matcher)
         tc = find_topcell(library=self.t_h.library)
         self.t_h.assign_topcell(tc)

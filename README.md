@@ -77,7 +77,7 @@ Basic help and command line options can be accessed with
  nanodescript -h
 ```
 
-### Foreword
+### Intro
 
 The point of application for nanodescript are patterns of microstructures integrated in a 
 semiconductor device fabrication process flow, such as micro-lenses arrays,
@@ -127,17 +127,31 @@ also be associated _manually_ with cells using the API.
 
 ![Demonstration pattern containing nanoscribe patterns.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true)
 
-### Describe Recipe Customisation
+### configuration
 
-The standard recipe applied for slicing `.stl` files is saved as a constant in the software.
-It can be accessed in the following way:
+Configuration options for the software are stored locally in a configuration file called `nanodescript_config.ini`.
+Notably, it contains the standard recipe applied in slicing `.stl` files and the path to the `describe.exe` executable.
 
-```python
-import nanodescript
-nanodescript.DEFAULT_RECIPE
+The location of the configuration file can be shown by using
+```bash
+nanodescript -c
+C:\Users\USERNAME\AppData\Local\nanodescript\nanodescript_config.ini
 ```
 
-It can be customized during execution using the `--recipe` option. See 
+The default recipe can be seen using
+```python
+import nanodescript
+nanodescript.nanodescript_config.get_default_recipe()
+```
+
+You can edit configuration entries by using e.g.
+```python
+import nanodescript
+nanodescript.nanodescript_config.edit_config('default_recipe', 'Filling.HatchingDistance', 0.2)
+nanodescript.nanodescript_config.save_config()
+```
+This edits the hatching distance of the default recipe. The call to `save_config` effectively overwrites the 
+`nanodescript_config.ini` file on disk so that the settings are applied at the program next start.
 
 ## Bugs
 

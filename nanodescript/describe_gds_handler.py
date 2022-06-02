@@ -9,7 +9,7 @@ from gdstk import Library, read_gds, Cell
 from tqdm import tqdm
 
 from nanodescript.config import nanodescript_config
-from nanodescript.nanoscribematcher import NanoscribeMatcher, PrintZoneCellMatcher
+from nanodescript.nanoscribe_matchers import get_matcher_by_name, NanoscribeMatcher
 from nanodescript.cell_transformation import CellTransformation
 from nanodescript.cell_association import CellAssociation
 from nanodescript.describe_gwl_handler import GwlHandler
@@ -27,7 +27,7 @@ class NanoscribeGdsHandler:
             self,
             library: Union[Library, str, Path],
             out_dir: Path,
-            matcher: NanoscribeMatcher = PrintZoneCellMatcher(),
+            matcher: NanoscribeMatcher = get_matcher_by_name(nanodescript_config.get('gds_handler','matcher')),
             describerecipe: DescribeRecipe = DescribeRecipe(),
             describepath: Path = Path(nanodescript_config.get('paths', 'describe')),
             gwlhandler: GwlHandler = GwlHandler(),
