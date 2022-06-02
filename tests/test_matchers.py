@@ -9,4 +9,3 @@ class TestMatcher:
 
     def test_get_matcher(self):
         assert isinstance(ndm.get_matcher_by_name('LayerMatcher'), ndm.NanoscribeMatcher)
-

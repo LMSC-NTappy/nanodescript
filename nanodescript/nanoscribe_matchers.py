@@ -45,7 +45,7 @@ class LayerMatcher(NanoscribeMatcher):
         """Raise an error if no shape from the library can be found with the layer number"""
         found = False
 
-        for cell in Library.cells:
+        for cell in library.cells:
             if self.match_cell(cell):
                 found = True
 
@@ -71,30 +71,30 @@ class LayerDatatypeMatcher(NanoscribeMatcher):
     def __init__(
             self,
             layer_num: int = int(conf.get('layerdatatypematcher', 'layer_number')),
-            datatype: int = int(conf.get('layerdatatypematcher', 'datatype_number')),
+            datatype_num: int = int(conf.get('layerdatatypematcher', 'datatype_number')),
     ):
         """Initialise a Matcher that matches nanoscribe gds shapes by layer number.
         Warning: Untested.
         """
         self.layer_num = layer_num
-        self.datatype = datatype
+        self.datatype_num = datatype_num
 
     def __str__(self) -> str:
-        return f"LayerNumberDatatypeMatcher matching layer {self.layer_num}/{self.datatype}"
+        return f"LayerNumberDatatypeMatcher matching layer {self.layer_num}/{self.datatype_num}"
 
     def __repr__(self) -> str:
-        return f"LayerNumberDatatypeMatcher matching layer {self.layer_num}/{self.datatype}"
+        return f"LayerNumberDatatypeMatcher matching layer {self.layer_num}/{self.datatype_num}"
 
     def setup(self, library: Library) -> None:
         """Raise an error if no shape from the library can be found with the layer number"""
         found = False
 
-        for cell in Library.cells:
+        for cell in library.cells:
             if self.match_cell(cell):
                 found = True
 
         if not found:
-            raise ValueError(f"No cell in {Library.name} gds contains a layer with number: {self.layer_num}")
+            raise ValueError(f"No poly in {Library.name} gds contains layer {self.layer_num}/{self.datatype_num}")
 
     def match_cell(self, gdscell: Cell) -> bool:
         """Check whether a gds cell matches with a nanoscribe print area.
@@ -104,7 +104,7 @@ class LayerDatatypeMatcher(NanoscribeMatcher):
 
         # Return True at the first matching object in the Cell.
         for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
-            if poly.layer == self.layer_num:
+            if poly.layer == self.layer_num and poly.datatype == self.datatype_num:
                 return True
 
         # Else return False

@@ -4,8 +4,9 @@ import logging
 import sys
 
 from nanodescript.describe_gds_handler import NanoscribeGdsHandler
-from nanodescript.nanoscribe_matchers import PrintZoneMatcher, get_matcher_by_name, get_all_matchers_names
+from nanodescript.nanoscribe_matchers import get_matcher_by_name
 from nanodescript.utils import find_stl_files, find_topcell, find_cell_by_name
+from nanodescript.describe_recipe_handler import DescribeRecipe
 
 from nanodescript.config import nanodescript_config as conf
 
@@ -19,8 +20,6 @@ def main():
                                      epilog='This command line interface only provides basic functionality. Check '
                                             'documentation or contact author for more information.')
 
-    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
-
     parser.add_argument("gds",
                         nargs=1,
                         type=Path,
@@ -30,6 +29,13 @@ def main():
                         nargs=1,
                         type=Path,
                         help='directory for output files')
+
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+
+    parser.add_argument('--verbose', '-v',
+                        action='count',
+                        help='Use this flag for verbose operation, use -vv for very verbose operation (debug)\n',
+                        default=0)
 
     parser.add_argument('--config', '-c',
                         action='version',
@@ -47,10 +53,17 @@ def main():
                         default=None)
 
     parser.add_argument('--matcher', '-m',
-                        nargs=1,
+                        type=str,
+                        action='store',
                         help='Override the matcher set in nanodescript_config.ini',
-                        default=conf.get('gds_handler','matcher'))
+                        default=conf.get('gds_handler', 'matcher'))
 
+    parser.add_argument('--recipe', '-r',
+                        nargs=1,
+                        type=Path,
+                        default=None,  # Falls back on config recipe at instantiation.
+                        help='Use this option to override the slicing recipe stored in nanodescript_config.ini'
+                        )
 
     parser.add_argument("--stl", "-s",
                         nargs="*",
@@ -66,12 +79,6 @@ def main():
                         help="Use this flag to disable recursive search of stl files",
                         )
 
-
-    parser.add_argument('--verbose', '-v',
-                        action='count',
-                        help='Use this flag for verbose operation, use -vv for very verbose operation (debug)\n',
-                        default=0)
-
     parser.add_argument('--origin', '-o',
                         nargs=2,
                         type=float,
@@ -79,13 +86,6 @@ def main():
                         help="Use this option to shift the print pattern origin by the specified amounts in X "
                              "and Y in um. EG, if -o 30.0 50.0 is used, the X=30.0 Y=50.0 um point of the gds pattern "
                              "will be used as the nanoscribe X=0.0, Y=0.0 position\n")
-
-    parser.add_argument('--recipe', '-r',
-                        nargs=1,
-                        type=Path,
-                        default=None,
-                        help='Use this option to override the slicing recipe stored in nanodescript_config.ini'
-                        )
 
     # parse the arguments from standard input
     args = parser.parse_args()
@@ -105,15 +105,21 @@ def main():
     logger.debug(f"resolved path: {args.out_dir[0].resolve()}")
     logger.info("----------------------------------------")
 
+    # get the matcher object from args
+    # logger.info("----------------------------------------")
+    logger.info(f'Setting matcher to: {args.matcher}')
+    matcher = get_matcher_by_name(args.matcher)
+
+    # get the recipe from args
+    recipe = DescribeRecipe(recipe_file=args.recipe)
 
     # Initialise gds handler
+
     gdsman = NanoscribeGdsHandler(library=args.gds[0],
                                   out_dir=args.out_dir[0],
+                                  matcher=matcher,
+                                  describerecipe=recipe,
                                   )
-
-    # # Update the path to describe.exe if needed
-    # if args.describe_exe is not None:
-    #     gdsman.describepath = args.describe_dir[0]
 
     logger.debug(f"Describe executable directory: {gdsman.describepath.resolve()}")
 
@@ -136,8 +142,6 @@ def main():
     # # Initialise a nanoscribe cell matcher
     # cellmatcher = PrintZoneMatcher()
     # gdsman.set_matcher(cellmatcher)
-    logging.info(f'Matcher set to: {cellmatcher}')
-    logger.info("----------------------------------------")
 
     # Perform Cell matching
     gdsman.find_nanoscribe_cells()

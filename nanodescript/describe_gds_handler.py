@@ -30,7 +30,6 @@ class NanoscribeGdsHandler:
             matcher: NanoscribeMatcher = get_matcher_by_name(nanodescript_config.get('gds_handler','matcher')),
             describerecipe: DescribeRecipe = DescribeRecipe(),
             describepath: Path = Path(nanodescript_config.get('paths', 'describe')),
-            gwlhandler: GwlHandler = GwlHandler(),
     ) -> None:
         """Initialise a gds manager object"""
 
@@ -43,7 +42,7 @@ class NanoscribeGdsHandler:
             self.library = library
 
         # Initialise handlers
-        self.gwlhandler = gwlhandler
+        self.gwlhandler = GwlHandler()
         self.describerecipe = describerecipe
 
         # Setting up the matcher

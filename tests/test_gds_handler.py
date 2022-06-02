@@ -7,7 +7,7 @@ from pathlib import Path
 from gdstk import Cell
 from pytest import raises
 
-TESTLIB = r"Y:\Nicolas\Software\descript_python\tests\test_data\test_pattern.gds"
+TESTLIB = r"Y:\Nicolas\Software\descript_python\tests\test_data\test_pattern_printzonematcher.gds"
 OUTDIR = r"Y:\Nicolas\Software\descript-python\tests\test_pattern"
 
 heredir = Path(__file__).parent

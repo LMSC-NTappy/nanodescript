@@ -7,7 +7,7 @@ import nanodescript.utils
 from nanodescript.describe_recipe_handler import DescribeRecipe
 from nanodescript import describe_commands as cmds
 
-test_pattern = "test_data/test_pattern.gds"
+test_pattern = "test_data/test_pattern_printzonematcher.gds"
 
 
 class TestUtils:
@@ -37,4 +37,5 @@ class TestUtils:
 
         with raises(ValueError):
             nanodescript.utils.find_topcell(Library())
+
 
