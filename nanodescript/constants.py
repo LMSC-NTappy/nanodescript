@@ -16,11 +16,10 @@ DESCRIBE_OUTPUT_FILES_SUFFIX = "files"
 
 #Default gds file configuration
 TOPCELLNAME = "topcell"  # Name match should be only lowercase alphabetic
-MATCHER_NAME = 'printzonematcher'
-
+MATCHER_NAME = 'layermatcher'
 
 #LAYER NUMBER and DATATYPE Matchers
-LAYER_NUMBER = 166
+LAYER_NUMBER = 66
 DATATYPE_NUMBER = 0
 
 #Default for print zone matcher
