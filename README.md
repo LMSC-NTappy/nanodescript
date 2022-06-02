@@ -167,16 +167,31 @@ Which outputs as expected
 
 ### stl matching
 
-The other shapes in those cells (the cross and the circle) are the footprints of the structures 
-to be printed. Their role is also purely informative as well. However, attention should
-be paid at this stage about the center of the cells. 
+Once nanoscribe cells have been matched, they are associated with files bearing the same names and 
+the `.stl` extension. In our example, `cross_20_80.stl` and`tip.stl` are searched. By default, the
+ files are searched in the same directory as the .gds library but this can be changed during execution.
 
-To find stl files corresponding to the nanoscribe cells, the software will look for file named
-like the cells bearing the `.stl` extension. In the example, it will look for `cross_20_80.stl` and 
-`tip.stl` files. By default, the search path is in the directory (and sub-directories) of 
-the gds file, but other search paths can be added through the CLI (see help). stl files can
-also be associated _manually_ with cells using the API.
+Since the stl matching is performed by cell name, needless to say the content of those cells can be 
+arbitrary. However, I recommend inserting shapes resembling the footprints of the structures 
+to be printed. Attention should be paid at this stage about the coordinate systems in the cells. The
+X-Y-Z orientation and origin in the .stl should ideally be identical to the one used in the nanoscribe
+cell.
 
+If for some reason this does not work for your application, stl files can also be associated _manually_ 
+using the API.
+
+### Transformations
+
+nanodescript (through the describe slicer) supports applying scaling and rotations to cells during 
+instantiations. Here below is an example with four crosses.
+
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/output_pattern_scale.PNG?raw=true" alt="Output with cell transformations" width="50%" height="50%">
+
+### Efficiency in the output 
+
+The main rationale for using nanodescript for patterning is that it guarantees that the slicing operation
+is performed the minimal necessary number of times, so that the output files are as small as possible and 
+render as quickly as possible
 
 ### configuration
 
