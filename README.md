@@ -1,14 +1,14 @@
 # nanodescript
 
-nanodescript is a python Command-Line Application / Application Programming interface
-patterning nanoscribe 2-photon stereo-lithography prints using the gds file format.
+nanodescript is a python Command-Line Application / Application Programming interface aiming at
+interfacing nanoscribe stereo-lithography prints with the gds file format, which is standard in
+the Semiconducting industry.
 
-It uses the Nanoscribe DeScribe slicer to generate patterns of nanoscribe prints 
-externally defined in a gds file. This allows for more flexibility than the 
-native patterning tool. This also provides integrability with other lithography and
-micro-fabrication processes. 
+It uses the Nanoscribe DeScribe slicer to generate patterns of nanoscribe prints externally defined 
+in a gds file. This allows for more flexibility than the native patterning tool. This also provides 
+integrability with other lithography and micro-fabrication processes. 
 
-The name nanodescript comes from NanoScribe DeScribe Scripting. 
+The name nanodescript comes from NanoScribe-DeScribe-Scripting. 
 
 Warning: nanodescript is NOT a standalone stl slicer for nanoscribe printers. It relies
 on a DeScribe installation existing on the system for performing the slicing operation and visualising 
@@ -47,15 +47,7 @@ running the pip install command from the extracted directory (use -e for dev-mod
 pip install .
 ```
 
-Running tests further require installing pytest (manually for now)
-
-```bash
-pip install pytest
-```
-
 ## Usage
-
-### TL;DR
 
 After installing nanodescript you run the following command in your anaconda prompt:
 
@@ -63,10 +55,9 @@ After installing nanodescript you run the following command in your anaconda pro
  nanodescript path_to_gds_file/pattern.gds path_to_output_dir/descript_output
 ```
 
-This will read the `pattern.gds` file, look for nanoscribe print zones and stl files 
-(see search method below) in the library, create the `descript_output` directory
-if it does not already exist. Then, it will create a `<library>_job.gwl` file named after your library
-containing nanoscribe-ready code.
+This will read the `pattern.gds` file, look for nanoscribe print zones and in the library, find associated
+stl files and slice them, create the `descript_output` directory if it does not exist already. 
+Inside, it will create a `<library>_job.gwl` file named after your library containing nanoscribe-ready code.
 
 Then, you can open the library with DeScribe and generate the 3D preview to verify the output
 before running it.
@@ -242,6 +233,12 @@ what you would like to change. Please make sure to update tests as appropriate.
 
 Improvement suggestions / New Feature requests are welcome as well. Commitment to testing 
 the new features and providing feedback is expected on the requesting side.
+
+Running the tests further requires installing pytest (manually for now)
+
+```bash
+pip install pytest
+```
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
