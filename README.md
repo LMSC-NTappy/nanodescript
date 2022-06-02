@@ -15,6 +15,8 @@ on a DeScribe installation existing on the system for performing the slicing ope
 the results. If you are interested in python slicing of stl files, check out SamDehaeck's
 [TipSlicer](https://github.com/SamDehaeck/TipSlicer) project.
 
+Nanodescript is developed and tested on the Photonic Professional GT(2).
+
 ## Documentation
 
 This is it. It should get you started, for more information I let you explore the code a bit yourself,
