@@ -122,7 +122,7 @@ In the example, the `nanoscribe_print_zone` cell contains a 100x100 um box displ
 This poly serves no other purpose than informing the user and won't be printed. Actually, the 
 content of the nanoscribe print zone can be arbitrary.
 
-![Demonstration of a pattern containing nanoscribe print zones.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true)
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true" alt="Demonstration of a pattern containing nanoscribe print zones." width="50%" height="50%">
 
 After running the following command from the directory containing the gds and stl files
 ```bash
@@ -131,7 +131,7 @@ nanodescript test_pattern_printzone.gds gds_slicing_output --matcher printzonema
 
 the following job file is created in the `gds_slicing_output` folder (also created).
 
-![Output of the Print Zone matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_printzone.PNG?raw=true)
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_printzone.PNG?raw=true" alt="Output of the Print Zone matching strategy" width="50%" height="50%">
 
 #### layer matching
 
@@ -140,7 +140,8 @@ This strategy matches all cells that contain polygons, paths or labels of a cert
 In the example below, the nanoscribe layer is number 66, here again both `cross_20_80` and `tip`
 are matched.
 
-![Demonstration of a pattern containing nanoscribe layers and datatypes.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern_layer.PNG)
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern_layer.PNG?raw=true" alt="Demonstration of a pattern containing nanoscribe layers and datatypes." width="50%" height="50%">
+
 
 After running the following command outputs the same result as the print zone matcher
 
@@ -148,8 +149,7 @@ After running the following command outputs the same result as the print zone ma
 nanodescript test_pattern_printzone.gds gds_slicing_output --matcher layermatcher
 ```
 
-![Output of the layer matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layer.PNG)
-
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layer.PNG?raw=true" alt="Output of the layer matching strategy" width="50%" height="50%">
 
 #### layer/datatype matching
 
@@ -162,7 +162,7 @@ nanodescript test_pattern_printzone.gds gds_slicing_output --matcher layerdataty
 
 Which outputs as expected
 
-![Output of the layer datatype matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layerdatatype.PNG?raw=true)
+<img src="https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layerdatatype.PNG?raw=true" alt="Output of the layer datatype matching strategy" width="50%" height="50%">
 
 
 ### stl matching
