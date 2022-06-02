@@ -42,8 +42,10 @@ conda install gdstk
 
 Other dependencies will be installed automatically when installing nanodescript.
 
-For now, nanodescript can be installed only from source by downloading the github repository, and
-running the pip install command from the extracted directory (use -e for dev-mode installation):
+For now, nanodescript can be installed only from source by downloading the github repository 
+(press code -> Download zip on this page). Then, uncompress it in a folder of your choice,
+start the anaconda prompt, go to the extracted directory and run the pip install command
+from (optionally, use -e for dev-mode installation):
 
 ```bash
 pip install .
@@ -70,7 +72,7 @@ Basic help and command line options can be accessed with
  nanodescript -h
 ```
 
-### Intro
+## Detailed Explanations
 
 The point of application for nanodescript are patterns of microstructures integrated in a 
 semiconductor device fabrication process flow, such as micro-lenses arrays,
@@ -84,7 +86,7 @@ Hereafter, we provide instructions for basic usage using the Command Line Interf
 pattern where crosses and tips are printed. (API) is briefly explained at the end, documentation
 will be expanded on request.
 
-### GDS software requirements
+### GDS software 
 
 We recommend designing patterns either programmatically using gdstk, or
 using [KLayout](https://www.klayout.de/) since it's open source. In
@@ -186,9 +188,9 @@ instantiations. Here below is an example with four crosses.
 
 The main rationale for using nanodescript for patterning is that it guarantees that the slicing operation
 is performed the minimal necessary number of times, so that the output files are as small as possible and 
-render as quickly as possible
+render as quickly as possible.
 
-### configuration
+## nanodescript configuration
 
 Configuration options for the software are stored locally in a configuration file called `nanodescript_config.ini`.
 Notably, it contains the default recipe applied for stl slicing, the path to `describe.exe` and options for .
@@ -239,8 +241,8 @@ Future developments will be made on a "need to use" basis. If you have ideas or 
 it to me, so we can look at how to implement it.
 
 Existing ideas include:
-- Customisation of individual print instances using labels as modificators.
-- STL generation from the gds pattern directly (simplest case: vertical extrusion).
+- Customisation of individual print instances using labels as modifiers.
+- STL generation from the gds pattern directly (most simple case: vertical extrusion).
 - Support for text printing.
 - Dedicated interface finding routines etc.
 
@@ -251,7 +253,7 @@ what you would like to change. Please make sure to update tests as appropriate.
 Improvement suggestions / New Feature requests are welcome as well. Commitment to testing 
 the new features and providing feedback is expected on the requesting side.
 
-Running the tests further requires installing pytest (manually for now)
+Running the tests further requires installing pytest (manually for now).
 
 ```bash
 pip install pytest
