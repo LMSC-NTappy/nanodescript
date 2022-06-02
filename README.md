@@ -96,28 +96,79 @@ We recommend designing patterns either programmatically using gdstk, or
 using [KLayout](https://www.klayout.de/) since it's open source. In
 principle anything else such as L-edit should work.
 
-### nanoscribe cells and stl files matching
+### nanoscribe cells matching
 
-To identify which cells are nanoscribe prints, the gds library file must contain a 
-cell named `nanoscribe_print_zone` (or a custom name can be changed by the user).
+To identify (==match) which cells are nanoscribe prints, the program applies a matching strategy.
+There are currently three different matching strategies supported:
+- Print zone matching (by default)
+- Layer matching
+- Layer/Datatype matching
 
-Then, all cells which contain an instance of the `nanoscribe_print_zone` cell will be
+They are described below but perform in essence the same task: identifying which cell 
+instances have to be included in the nanoscribe gwl job.
+
+#### Print zone matching
+
+This strategy matches all cells that contain a reference to a "print-zone" cell 
+named `nanoscribe_print_zone` (or a custom name set by the user).
+
+All cells containing an instance of the `nanoscribe_print_zone` cell will be
 identified as nanoscribe print zones. The following image shows an example pattern where
-a cross and a flat cone (tip) need to be printed in an array. Here, the cells 
-`cross_20_80` and `tip` both contain a `nanoscribe_print_zone` instance, which is
-a cell containing only a 100x100 um box displayed in pink. The box serves no other 
-purpose than informing the user and won't be printed. 
+a cross and a flat cone (tip) needs to be printed in an array. Here, both
+`cross_20_80` and `tip` contain a `nanoscribe_print_zone` instance directly. 
+Cells occupying the upper levels of the hierarchy are not matched.
+
+In the example, the `nanoscribe_print_zone` cell contains a 100x100 um box displayed in pink. 
+This poly serves no other purpose than informing the user and won't be printed. Actually, the 
+content of the nanoscribe print zone can be arbitrary.
+
+![Demonstration of a pattern containing nanoscribe print zones.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true)
+
+After running the following command from the directory containing the gds and stl files
+```bash
+nanodescript test_pattern_printzone.gds gds_slicing_output --matcher printzonematcher
+```
+
+the following job file is created in the `gds_slicing_output` folder (also created).
+
+![Output of the Print Zone matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_printzone.PNG?raw=true)
+
+#### layer matching
+
+This strategy matches all cells that contain polygons, paths or labels of a certain layer number.
+
+In the example below, the nanoscribe layer is number 66, here again both `cross_20_80` and `tip`
+are matched.
+
+![Demonstration of a pattern containing nanoscribe layers and datatypes.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern_layer.PNG?raw=true)
+
+After running the following command outputs the same result as the print zone matcher
+
+```bash
+nanodescript test_pattern_printzone.gds gds_slicing_output --matcher layermatcher
+```
+
+![Output of the layer matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layer.PNG?raw=true)
+
+#### layer/datatype matching
+
+This strategy extends on the previous one by only matching cells containing a certain layer number and datatype number
+combination. For example, the layer 66 and datatype 1 combination can be used to print only part of the cross pattern.
+
+```bash
+nanodescript test_pattern_printzone.gds gds_slicing_output --matcher layerdatatypematcher
+```
+
+Which outputs as expected
+
+![Output of the layer datatype matching strategy](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/outputpattern_layerdatatype.PNG?raw=true)
+
+
+### stl matching
 
 The other shapes in those cells (the cross and the circle) are the footprints of the structures 
 to be printed. Their role is also purely informative as well. However, attention should
-be paid at this stage about the center of the cells. The x-y origin of nanoscribe cells (0.0,0.0)
-should correspond to the origin of the .stl file. The X-Y-Z axes orientations should be identical as well.
-
-This strategy (that I call print zone matching) is interesting for its simplicity. There is no 
-doubt about how the cell will behave in cascading dependencies. Other cell matching strategies 
-such as matching cells containing shapes of a specific layer/datatype combination are also 
-available but not directly supported in the CLI (API only). Those can be helpful to avoid bloating
-the gds library with print zones.
+be paid at this stage about the center of the cells. 
 
 To find stl files corresponding to the nanoscribe cells, the software will look for file named
 like the cells bearing the `.stl` extension. In the example, it will look for `cross_20_80.stl` and 
@@ -125,7 +176,6 @@ like the cells bearing the `.stl` extension. In the example, it will look for `c
 the gds file, but other search paths can be added through the CLI (see help). stl files can
 also be associated _manually_ with cells using the API.
 
-![Demonstration pattern containing nanoscribe patterns.](https://github.com/LMSC-NTappy/nanodescript/blob/master/media/demo_pattern.PNG?raw=true)
 
 ### configuration
 
