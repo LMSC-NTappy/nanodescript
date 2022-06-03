@@ -227,13 +227,30 @@ This edits the hatching distance of the default recipe. The call to `save_config
 `nanodescript_config.ini` file on disk so that the settings are applied at the program next start 
 (can also be achieved by calling `edit_config` with the `also_save=True` optional argument).
 
+## API usage
+For advanced applications, the nanodescript module can be imported in a python project with
+```python
+import nanodescript
+```
+This allows to manually instantiate gds handler objects, manually associate cells with print jobs etc.
+For instance:
+```python
+import nanodescript
+gdshandle = nanodescript.NanoscribeGdsHandler(library='Example_LIB.gds',out_dir='here')
+gdshandle.reset_nanoscribe_cells() #Set all cells to non-nanoscribe
+gdshandle.set_nanoscribe_cell('example_cell',True) #Set a specific cell as a nanoscribe print manually
+```
+
+From there on, I let you look at the code yourself and let me know if you have questions / are trying
+to achieve something specifically.
+
 ## Bugs and releases
 
 Nanodescript is currently pre-alpha release, meaning that it is continuously developed
 to fit my needs and applications. I try to implement some kind of continuous deployment 
 workflow.
 
-In any case, if you use this code I am happy, if you signal me bugs I am even more happy.
+In any case, if you use this code I am happy, if you signal me bugs I am even happier.
 
 ## Further developments
 
