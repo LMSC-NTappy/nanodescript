@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 import logging
+import re
 
 from nanodescript.stl_handler import StlFile
 from nanodescript.cell_transformation import CellTransformation
@@ -109,6 +110,22 @@ class DescribeRecipe:
         self.update_recipe("Model.Rotation", rotationstring)
         self.update_recipe("Model.Scaling", scalingstring)
         self.update_recipe("Model.Translation", "X:0 Y:0 Z:0")
+
+    def get_bounding_box(self) -> (float, float, float, float, float, float):
+        """Get the bounding box in floating point values"""
+        bbox = self.recipe['Model.BoundingBox']
+        bsplit = re.split(':| ', bbox)
+        result = []
+        for s in bsplit:
+            if s is not False and s not in ['Minimum','Maximum','X','Y','Z']:
+                result.append(float(s))
+        xmin = result[0]
+        ymin = result[1]
+        zmin = result[2]
+        xmax = result[3]
+        ymax = result[4]
+        zmax = result[5]
+        return xmin, ymin, zmin, xmax, ymax, zmax
 
     def _recipe_from_config(self,) -> dict:
         """Return the recipe from the configuration file"""

@@ -27,7 +27,7 @@ class NanoscribeGdsHandler:
             self,
             library: Union[Library, str, Path],
             out_dir: Path,
-            matcher: NanoscribeMatcher = get_matcher_by_name(nanodescript_config.get('gds_handler','matcher')),
+            matcher: NanoscribeMatcher = get_matcher_by_name(nanodescript_config.get('gds_handler', 'matcher')),
             describerecipe: DescribeRecipe = DescribeRecipe(),
             describepath: Path = Path(nanodescript_config.get('paths', 'describe')),
     ) -> None:
@@ -123,7 +123,7 @@ class NanoscribeGdsHandler:
         # Then, output a list of all cells evaluating Nanoscribe as true.
         for cell in self.library.cells:
             if cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))[0]:
-                    ns_cells.append(cell)
+                ns_cells.append(cell)
         return ns_cells
 
     def match_stl_files(self, stlpaths: list[Path] = None) -> None:
@@ -132,7 +132,7 @@ class NanoscribeGdsHandler:
 
         # Check if the nanoscribe property is set in the cells
         if self.library.cells[0].get_property(nanodescript_config.get('identifiers', 'is_nanoscribe')) is None:
-                raise ValueError('Nanoscribe property not set in the library. Try running find_nanoscribe_cells() first')
+            raise ValueError('Nanoscribe property not set in the library. Try running find_nanoscribe_cells() first')
 
         # If no paths passed in argument try to find them
         if stlpaths is None:
@@ -145,7 +145,8 @@ class NanoscribeGdsHandler:
             if cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe')) == [1]:
                 try:
                     idx = names.index(cell.name)
-                    cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'), str(stlpaths[idx].resolve()))
+                    cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'),
+                                      str(stlpaths[idx].resolve()))
                 except ValueError:
                     cell.set_property(nanodescript_config.get('identifiers', 'stl_file_path'), 'STL_NOT_FOUND')
             else:
@@ -281,7 +282,13 @@ class NanoscribeGdsHandler:
 
         for k, asso in enumerate(self.nanoscribe_cells_associations):
             printpos = np.array(asso.transformation.origin)
-            move = printpos - current_pos
+            xmin, ymin, zmin, xmax, ymax, zmax = asso.recipe.get_bounding_box()
+            shiftx = (xmin + xmax) / 2.
+            shifty = (ymin + ymax) / 2.
+            shift = np.array((shiftx, shifty))
+            logger.debug(f"Cell shift due to origin: {shift}")
+            move = (printpos - shift) - current_pos
+            logger.debug(f"Adding move to print job: {move}")
             self.gwlhandler.add_command(cmds.Describe_empty())
             self.gwlhandler.add_command(cmds.Comment(f'Nanoscribe Zone {k}: {asso.cell.name}'))
             self.gwlhandler.add_command(cmds.MoveStageX(val=move[0]))
@@ -293,6 +300,7 @@ class NanoscribeGdsHandler:
                 include_file = asso.include_file
                 logger.warning(f"Using absolute import for file {asso.include_file}")
 
+            logger.debug(f"Adding include to print job: {include_file}")
             self.gwlhandler.add_command(cmds.Describe_include(str(include_file)))
             current_pos = printpos
 
