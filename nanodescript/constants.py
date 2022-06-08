@@ -2,7 +2,7 @@
 # or resetting the configuration file of this project. It also provides some special functionality such as
 # type definition whereas the configparser only provides strings.
 
-#identifiers defaults
+# identifiers defaults
 NANOSCRIBEPROPERTY = 'is_nanoscribe'
 STLPROPERTY = 'stl_file_path'
 DESCRIBE_DEFAULT_PATH = 'C:\\Program Files\\Nanoscribe\\DeScribe\\DeScribe.exe'
@@ -14,15 +14,15 @@ DESCRIBE_OUTPUT_JOBGWL_SUFFIX = "job.gwl"
 DESCRIBE_OUTPUT_RECIPE_SUFFIX = "job.recipe"
 DESCRIBE_OUTPUT_FILES_SUFFIX = "files"
 
-#Default gds file configuration
+# Default gds file configuration
 TOPCELLNAME = "topcell"  # Name match should be only lowercase alphabetic
 MATCHER_NAME = 'layermatcher'
 
-#LAYER NUMBER and DATATYPE Matchers
+# LAYER NUMBER and DATATYPE Matchers
 LAYER_NUMBER = 66
 DATATYPE_NUMBER = 0
 
-#Default for print zone matcher
+# Default for print zone matcher
 PRINTZONE_NAME = 'nanoscribe_print_zone'
 
 # The default recipe contains all default configurations but no model

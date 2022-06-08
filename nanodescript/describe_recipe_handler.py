@@ -114,7 +114,7 @@ class DescribeRecipe:
     def get_bounding_box(self) -> (float, float, float, float, float, float):
         """Get the bounding box in floating point values"""
         bbox = self.recipe['Model.BoundingBox']
-        bsplit = re.split(':| ', bbox)
+        bsplit = re.split('[: ]', bbox)
         result = []
         for s in bsplit:
             if s is not False and s not in ['Minimum','Maximum','X','Y','Z']:

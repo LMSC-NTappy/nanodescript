@@ -266,8 +266,9 @@ class NanoscribeGdsHandler:
             y0 = minpos[1]
         self.print_origin = np.array((x0, y0))
 
-    def create_print_job(self) -> None:
-        """Create the print job"""
+    def create_print_job(self, roundmove: int = 4) -> None:
+        """Create the print job. roundmove can be used to adjust the rounding of movements
+        (default: round to 0.1 nm)"""
         self.gwlhandler.add_header()
         self.gwlhandler.add_system_initialisation(self.describerecipe)
         self.gwlhandler.add_command(cmds.Describe_empty())
@@ -282,17 +283,12 @@ class NanoscribeGdsHandler:
 
         for k, asso in enumerate(self.nanoscribe_cells_associations):
             printpos = np.array(asso.transformation.origin)
-            xmin, ymin, zmin, xmax, ymax, zmax = asso.recipe.get_bounding_box()
-            shiftx = (xmin + xmax) / 2.
-            shifty = (ymin + ymax) / 2.
-            shift = np.array((shiftx, shifty))
-            logger.debug(f"Cell shift due to origin: {shift}")
-            move = (printpos - shift) - current_pos
+            move = printpos - current_pos
             logger.debug(f"Adding move to print job: {move}")
             self.gwlhandler.add_command(cmds.Describe_empty())
             self.gwlhandler.add_command(cmds.Comment(f'Nanoscribe Zone {k}: {asso.cell.name}'))
-            self.gwlhandler.add_command(cmds.MoveStageX(val=move[0]))
-            self.gwlhandler.add_command(cmds.MoveStageY(val=move[1]))
+            self.gwlhandler.add_command(cmds.MoveStageX(val=round(move[0], roundmove)))
+            self.gwlhandler.add_command(cmds.MoveStageY(val=round(move[1], roundmove)))
             # Include the output relative to the output directory
             if asso.include_file.is_relative_to(self.out_dir):
                 include_file = asso.include_file.relative_to(self.out_dir)
@@ -302,7 +298,13 @@ class NanoscribeGdsHandler:
 
             logger.debug(f"Adding include to print job: {include_file}")
             self.gwlhandler.add_command(cmds.Describe_include(str(include_file)))
-            current_pos = printpos
+
+            xmin, ymin, zmin, xmax, ymax, zmax = asso.recipe.get_bounding_box()
+            shiftx = (xmin + xmax) / 2.
+            shifty = (ymin + ymax) / 2.
+            shift = np.array((shiftx, shifty))
+            logger.debug(f"Move shift due to origin: {shift}")
+            current_pos = printpos + shift
 
     def export_print_job(self, fname: str = None) -> None:
         """Export the main print job"""

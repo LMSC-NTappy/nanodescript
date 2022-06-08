@@ -401,7 +401,7 @@ class GalvoZOffset(DescribeCommand):
 class MoveStageX(DescribeCommand):
     """Performs a relative displacement of the x|y-axis. Unit [um]"""
 
-    def __init__(self, val: float = 0.0, ):
+    def __init__(self, val: float = 0.0,):
         self.val = val
 
 
