@@ -269,10 +269,17 @@ class NanoscribeGdsHandler:
     def create_print_job(self, roundmove: int = 4) -> None:
         """Create the print job. roundmove can be used to adjust the rounding of movements
         (default: round to 0.1 nm)"""
+        # Add Nanodescript Header
         self.gwlhandler.add_header()
+        # Add system initialisation from recipe
         self.gwlhandler.add_system_initialisation(self.describerecipe)
+        # Add writing configuration from recipe
         self.gwlhandler.add_command(cmds.Describe_empty())
         self.gwlhandler.add_writing_configuration(self.describerecipe)
+        # Add Scan Field offsets from recipe
+        self.gwlhandler.add_command(cmds.Describe_empty())
+        self.gwlhandler.add_field_offsets()
+        # Add the writing parameters from recipe
         self.gwlhandler.add_command(cmds.Describe_empty())
         self.gwlhandler.add_writing_parameters(self.describerecipe)
 
