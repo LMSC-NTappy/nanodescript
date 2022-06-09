@@ -321,7 +321,7 @@ class XOffset(DescribeCommand):
 
     # Overloading the DescribeCommand str method seems superfluous here
     def __str__(self):
-        return f"XOffset {self.val}\n"
+        return f"XOffset {self.val}"
 
 
 class YOffset(DescribeCommand):
@@ -334,7 +334,7 @@ class YOffset(DescribeCommand):
 
     # Overloading the DescribeCommand str method seems superfluous here
     def __str__(self):
-        return f"YOffset {self.val}\n"
+        return f"YOffset {self.val}"
 
 
 class ZOffset(DescribeCommand):
@@ -347,7 +347,7 @@ class ZOffset(DescribeCommand):
 
     # Overloading the DescribeCommand str method seems superfluous here
     def __str__(self):
-        return f"ZOffset {self.val}\n"
+        return f"ZOffset {self.val}"
 
 
 class PiezoXOffset(DescribeCommand):
