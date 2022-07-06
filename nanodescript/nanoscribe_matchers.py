@@ -59,8 +59,11 @@ class LayerMatcher(NanoscribeMatcher):
         """
 
         # Return True at the first matching object in the Cell.
-        for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
+        for poly in gdscell.polygons + gdscell.labels:
             if poly.layer == self.layer_num:
+                return True
+        for path in gdscell.paths:
+            if self.layer_num in path.layers:
                 return True
 
         # Else return False
@@ -103,8 +106,11 @@ class LayerDatatypeMatcher(NanoscribeMatcher):
         """
 
         # Return True at the first matching object in the Cell.
-        for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
+        for poly in gdscell.polygons + gdscell.labels:
             if poly.layer == self.layer_num and poly.datatype == self.datatype_num:
+                return True
+        for path in gdscell.paths:
+            if self.layer_num in path.layers and self.datatype_num in path.datatypes:
                 return True
 
         # Else return False
